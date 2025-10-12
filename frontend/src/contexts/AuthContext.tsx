@@ -6,7 +6,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (userData: any) => Promise<void>;
+  register: (userData: Partial<User>) => Promise<void>;
   logout: () => void;
   updateUser: (userData: Partial<User>) => Promise<void>;
 }
@@ -21,15 +21,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkAuth();
   }, []);
 
-  const checkAuth = async () => {
+  const checkAuth = () => {
     const token = localStorage.getItem('auth_token');
-    if (token) {
-      try {
-        const { user } = await authAPI.getProfile();
-        setUser(user);
-      } catch (error) {
-        localStorage.removeItem('auth_token');
-      }
+    const user = localStorage.getItem('user');
+    if (token && user) {
+      setUser(JSON.parse(user));
     }
     setLoading(false);
   };
@@ -37,23 +33,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string) => {
     const { user, token } = await authAPI.login(email, password);
     localStorage.setItem('auth_token', token);
+    localStorage.setItem('user', JSON.stringify(user));
     setUser(user);
   };
 
-  const register = async (userData: any) => {
+  const register = async (userData: Partial<User>) => {
     const { user, token } = await authAPI.register(userData);
     localStorage.setItem('auth_token', token);
+    localStorage.setItem('user', JSON.stringify(user));
     setUser(user);
   };
 
   const logout = () => {
     localStorage.removeItem('auth_token');
+    localStorage.removeItem('user');
     setUser(null);
     window.location.href = '/login';
   };
 
   const updateUser = async (userData: Partial<User>) => {
     const { user: updatedUser } = await authAPI.updateProfile(userData);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
     setUser(updatedUser);
   };
 

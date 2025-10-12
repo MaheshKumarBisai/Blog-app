@@ -1,7 +1,7 @@
 import React from 'react';
 import { ContentCard } from './ContentCard';
 import { Content } from '../../types';
-import { Sparkles, Frown } from 'lucide-react';
+import { Frown } from 'lucide-react';
 
 interface ContentGridProps {
   content: Content[];
@@ -37,7 +37,7 @@ export const ContentGrid: React.FC<ContentGridProps> = ({ content, loading = fal
         </div>
         <h3 className="text-2xl font-bold text-gray-900 mb-3">No content found</h3>
         <p className="text-gray-600 max-w-md mx-auto mb-6">
-          We couldn't find any content matching your filters. Try adjusting your search or explore different categories.
+          We couldn&apos;t find any content matching your filters. Try adjusting your search or explore different categories.
         </p>
         <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-200 hover:scale-105">
           Explore All Content
@@ -48,7 +48,7 @@ export const ContentGrid: React.FC<ContentGridProps> = ({ content, loading = fal
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {content.map((item, index) => (
+      {content.map((item) => (
         <ContentCard 
           key={item.id} 
           content={item}
