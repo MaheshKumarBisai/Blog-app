@@ -32,8 +32,8 @@ export const Register: React.FC = () => {
     try {
       await register(formData);
       navigate('/');
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Registration failed. Please try again.');
+    } catch {
+      setError('Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }

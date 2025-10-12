@@ -5,6 +5,7 @@ import { Header } from './components/Layout/Header';
 import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
+import { ProfilePage } from './pages/ProfilePage';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
@@ -37,6 +38,7 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 const AppRoutes: React.FC = () => {
   return (
     <Router>
+      <Header />
       <Routes>
         {/* Public routes */}
         <Route path="/login" element={
@@ -52,10 +54,14 @@ const AppRoutes: React.FC = () => {
 
         {/* Protected routes */}
         <Route path="/" element={
-          <>
-            <Header />
+          <ProtectedRoute>
             <Home />
-          </>
+          </ProtectedRoute>
+        } />
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
         } />
 
         {/* Fallback route */}

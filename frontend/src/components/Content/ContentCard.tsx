@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Play, Headphones, FileText, Lock, Calendar, User, Star, Eye } from 'lucide-react';
+import { Play, Headphones, FileText, Star, Eye, Heart } from 'lucide-react';
 import { Content } from '../../types';
 
 interface ContentCardProps {
@@ -8,16 +8,16 @@ interface ContentCardProps {
 }
 
 export const ContentCard: React.FC<ContentCardProps> = ({ content }) => {
-  const getContentIcon = () => {
+  const getContentIcon = (className = "h-5 w-5") => {
     switch (content.content_type) {
       case 'video':
-        return <Play className="h-5 w-5" />;
+        return <Play className={className} />;
       case 'podcast':
-        return <Headphones className="h-5 w-5" />;
+        return <Headphones className={className} />;
       case 'blog':
-        return <FileText className="h-5 w-5" />;
+        return <FileText className={className} />;
       default:
-        return <FileText className="h-5 w-5" />;
+        return <FileText className={className} />;
     }
   };
 
@@ -34,19 +34,6 @@ export const ContentCard: React.FC<ContentCardProps> = ({ content }) => {
     }
   };
 
-  const getTypeGradient = () => {
-    switch (content.content_type) {
-      case 'video':
-        return 'bg-gradient-to-br from-red-500 to-pink-500';
-      case 'podcast':
-        return 'bg-gradient-to-br from-purple-500 to-indigo-500';
-      case 'blog':
-        return 'bg-gradient-to-br from-blue-500 to-cyan-500';
-      default:
-        return 'bg-gradient-to-br from-gray-500 to-gray-600';
-    }
-  };
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -55,63 +42,53 @@ export const ContentCard: React.FC<ContentCardProps> = ({ content }) => {
     });
   };
 
-  const getReadTime = () => {
-    if (content.content_type === 'blog' && content.content_text) {
-      const words = content.content_text.split(' ').length;
-      const minutes = Math.ceil(words / 200);
-      return `${minutes} min read`;
-    }
-    return null;
-  };
-
   return (
-    <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl border border-gray-100 overflow-hidden transition-all duration-500 hover:scale-105 animate-fade-in shine-effect">
+    <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl border border-gray-100 overflow-hidden transition-all duration-300 hover:-translate-y-1 animate-fade-in">
       {/* Thumbnail */}
-      <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
-        {content.thumbnail_url ? (
-          <img
-            src={content.thumbnail_url}
-            alt={content.title}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-          />
-        ) : (
-          <div className={`w-full h-full flex items-center justify-center ${getTypeGradient()} bg-gradient-to-br`}>
-            <div className="text-white text-4xl opacity-80">
-              {getContentIcon()}
+      <div className="relative h-48 overflow-hidden">
+        <Link to={`/content/${content.slug}`} className="block w-full h-full">
+          {content.thumbnail_url ? (
+            <img
+              src={content.thumbnail_url}
+              alt={content.title}
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            />
+          ) : (
+            <div className={`w-full h-full flex items-center justify-center bg-gradient-to-br ${getTypeColor()}`}>
+              <div className="text-white opacity-80">
+                {getContentIcon("h-10 w-10")}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </Link>
         
         {/* Premium Badge */}
         {content.is_premium && (
-          <div className="absolute top-3 left-3">
-            <div className="bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center space-x-1">
-              <Star className="h-3 w-3" fill="currentColor" />
-              <span>PREMIUM</span>
-            </div>
+          <div className="absolute top-3 left-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center space-x-1">
+            <Star className="h-3 w-3" fill="currentColor" />
+            <span>PREMIUM</span>
           </div>
         )}
 
         {/* Content Type Badge */}
-        <div className="absolute top-3 right-3">
-          <div className={`bg-gradient-to-r ${getTypeColor()} text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg flex items-center space-x-1`}>
-            {getContentIcon()}
-            <span className="capitalize">{content.content_type}</span>
-          </div>
+        <div className="absolute top-3 right-3 bg-black/50 text-white px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm flex items-center space-x-1.5">
+          {getContentIcon("h-4 w-4")}
+          <span className="capitalize">{content.content_type}</span>
         </div>
 
-        {/* Overlay Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
-        {/* View Button */}
-        <div className="absolute bottom-3 left-3 right-3 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-          <Link
-            to={`/content/${content.id}`}
-            className="w-full bg-white text-gray-900 px-4 py-2.5 rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-gray-50 transition-colors shadow-lg"
-          >
-            <Eye className="h-4 w-4" />
-            <span>View {content.content_type}</span>
-          </Link>
+        {/* Overlay for creator info */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
+          <div className="flex items-center space-x-3">
+            <img
+              src={content.creator_avatar || `https://ui-avatars.com/api/?name=${content.creator_display_name}&background=random`}
+              alt={content.creator_display_name}
+              className="w-10 h-10 rounded-full border-2 border-white/80"
+            />
+            <div>
+              <p className="font-semibold text-white text-sm">{content.creator_display_name}</p>
+              <p className="text-xs text-white/80">{formatDate(content.created_at)}</p>
+            </div>
+          </div>
         </div>
       </div>
       
@@ -119,14 +96,14 @@ export const ContentCard: React.FC<ContentCardProps> = ({ content }) => {
       <div className="p-5">
         {/* Category */}
         {content.category_name && (
-          <span className="inline-block bg-gray-100 text-gray-600 px-2.5 py-1 rounded-lg text-xs font-medium mb-3">
+          <span className="inline-block bg-purple-100 text-purple-700 px-2.5 py-1 rounded-md text-xs font-semibold mb-3">
             {content.category_name}
           </span>
         )}
 
         {/* Title */}
-        <h3 className="font-bold text-gray-900 mb-2 line-clamp-2 leading-tight text-lg group-hover:text-purple-600 transition-colors">
-          <Link to={`/content/${content.id}`}>
+        <h3 className="font-bold text-gray-900 mb-3 line-clamp-2 leading-snug text-lg group-hover:text-purple-600 transition-colors">
+          <Link to={`/content/${content.slug}`}>
             {content.title}
           </Link>
         </h3>
@@ -138,43 +115,23 @@ export const ContentCard: React.FC<ContentCardProps> = ({ content }) => {
           </p>
         )}
 
-        {/* Meta Info */}
-        <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-          <div className="flex items-center space-x-4">
-            {/* Creator */}
-            <div className="flex items-center space-x-2">
-              <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                <User className="h-3 w-3 text-white" />
+        {/* Stats */}
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100 text-sm text-gray-500">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-1.5">
+                <Eye className="h-4 w-4 text-gray-400" />
+                <span>1.2K</span>
               </div>
-              <span className="font-medium text-gray-700">
-                {content.creator_display_name || content.creator_username}
-              </span>
+              <div className="flex items-center space-x-1.5">
+                <Heart className="h-4 w-4 text-gray-400" />
+                <span>45</span>
+              </div>
             </div>
-          </div>
-
-          {/* Date */}
-          <div className="flex items-center space-x-1 text-gray-400">
-            <Calendar className="h-3 w-3" />
-            <span>{formatDate(content.created_at)}</span>
-          </div>
-        </div>
-
-        {/* Read Time & Stats */}
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-          {getReadTime() && (
-            <span className="text-xs text-gray-400 font-medium">
-              {getReadTime()}
-            </span>
-          )}
-          <div className="flex items-center space-x-4 text-xs text-gray-400">
-            <span>👁️ 1.2K views</span>
-            <span>❤️ 45 likes</span>
-          </div>
+            <Link to={`/content/${content.slug}`} className="text-sm font-semibold text-purple-600 hover:text-purple-800">
+              Read More →
+            </Link>
         </div>
       </div>
-
-      {/* Hover Border Effect */}
-      <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-purple-500/20 transition-colors duration-300 pointer-events-none"></div>
     </div>
   );
 };

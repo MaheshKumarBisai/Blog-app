@@ -1,44 +1,121 @@
 import React, { useState, useEffect } from 'react';
 import { ContentGrid } from '../components/Content/ContentGrid';
 import { Content, Category } from '../types';
-import { contentAPI } from '../services/api';
+
+const mockContent: Content[] = [
+  {
+    id: '1',
+    creator_id: 'user1',
+    title: 'Getting Started with React',
+    slug: 'getting-started-with-react',
+    description: 'A comprehensive guide to start with React.',
+    content_type: 'blog',
+    thumbnail_url: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80',
+    is_premium: false,
+    is_published: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    category_name: 'Technology',
+  },
+  {
+    id: '2',
+    creator_id: 'user2',
+    title: 'The Future of AI',
+    slug: 'future-of-ai',
+    description: 'Exploring the future of artificial intelligence.',
+    content_type: 'video',
+    thumbnail_url: 'https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80',
+    is_premium: true,
+    is_published: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    category_name: 'AI',
+  },
+  {
+    id: '3',
+    creator_id: 'user3',
+    title: 'Design Principles for Developers',
+    slug: 'design-principles-for-developers',
+    description: 'Learn key design principles for developers.',
+    content_type: 'podcast',
+    thumbnail_url: 'https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1287&q=80',
+    is_premium: false,
+    is_published: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    category_name: 'Design',
+  },
+    {
+    id: '4',
+    creator_id: 'user1',
+    title: 'Advanced TypeScript',
+    slug: 'advanced-typescript',
+    description: 'Deep dive into advanced TypeScript features.',
+    content_type: 'blog',
+    thumbnail_url: 'https://images.unsplash.com/photo-1549692520-acc6669e2f0c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1287&q=80',
+    is_premium: true,
+    is_published: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    category_name: 'Technology',
+  },
+  {
+    id: '5',
+    creator_id: 'user2',
+    title: 'Building a Startup',
+    slug: 'building-a-startup',
+    description: 'An interview with a successful startup founder.',
+    content_type: 'podcast',
+    thumbnail_url: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1974&q=80',
+    is_premium: false,
+    is_published: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    category_name: 'Business',
+  },
+  {
+    id: '6',
+    creator_id: 'user3',
+    title: 'Animating with Framer Motion',
+    slug: 'animating-with-framer-motion',
+    description: 'A tutorial on creating animations with Framer Motion.',
+    content_type: 'video',
+    thumbnail_url: 'https://images.unsplash.com/photo-1554302242-42d45a18a29a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1287&q=80',
+    is_premium: false,
+    is_published: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    category_name: 'Design',
+  },
+];
 
 export const Home: React.FC = () => {
   const [content, setContent] = useState<Content[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
   const [filters, setFilters] = useState({
     type: '',
     category: '',
     page: 1,
   });
 
-  const loadContent = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await contentAPI.getAllContent(filters);
-      setContent(response.content);
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to load content');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadCategories = async () => {
-    try {
-      const response = await contentAPI.getCategories();
-      setCategories(response.categories);
-    } catch (err) {
-      console.error('Failed to load categories:', err);
-    }
-  };
-
   useEffect(() => {
-    loadContent();
-    loadCategories();
+    setLoading(true);
+    setTimeout(() => {
+      let filteredContent = mockContent;
+
+      if (filters.type) {
+        filteredContent = filteredContent.filter(item => item.content_type === filters.type);
+      }
+
+      if (filters.category) {
+        filteredContent = filteredContent.filter(item => item.category_slug === filters.category);
+      }
+
+      setContent(filteredContent);
+      setLoading(false);
+    }, 500);
   }, [filters]);
 
   const updateFilter = (key: string, value: string) => {
