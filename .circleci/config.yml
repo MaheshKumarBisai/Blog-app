@@ -37,7 +37,7 @@ jobs:
           fingerprints:
             - "SHA256:9ajH+lqwmRGo1IWNb2wwtf2IDAByxh1TxNjmmINm6DM"
       - run:
-          name: Deploy
+          name: Deploy to EC2
           command: |
             ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP "
               if [ ! -d /home/ec2-user/blog-app ]; then
@@ -45,8 +45,10 @@ jobs:
               fi &&
               cd /home/ec2-user/blog-app &&
               git pull origin main &&
-              cd backend && npm install &&
-              cd ../frontend && npm install && npm run build &&
+
+              cd backend && npm install && cd .. &&
+              cd frontend && npm install && npm run build && cd .. &&
+
               pm2 restart blog-app || pm2 start backend/server.js --name blog-app
             "
 
